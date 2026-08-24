@@ -3,6 +3,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Category, Supplier, Location } from "@/types/inventory";
+import { useLanguage } from "@/hooks/useLanguage";
 
 export interface AnalyticsFilterValues {
   categoryId: string | null;
@@ -19,13 +20,18 @@ interface AnalyticsFiltersProps {
   locations: Location[];
 }
 
-const DATE_PRESETS = [
-  { label: "Last 30 days", value: 30 },
-  { label: "Last 90 days", value: 90 },
-  { label: "This Year", value: 365 },
-];
+function useDatePresets() {
+  const { t } = useLanguage();
+  return [
+    { label: t("analytics.filters.last30Days"), value: 30 },
+    { label: t("analytics.filters.last90Days"), value: 90 },
+    { label: t("analytics.filters.thisYear"), value: 365 },
+  ];
+}
 
 export function AnalyticsFilters({ filters, onChange, categories, suppliers, locations }: AnalyticsFiltersProps) {
+  const { t } = useLanguage();
+  const DATE_PRESETS = useDatePresets();
   const activeCount = [filters.categoryId, filters.supplierId, filters.locationId].filter(Boolean).length;
 
   const set = (key: keyof AnalyticsFilterValues, value: string | number | null) =>
@@ -45,34 +51,34 @@ export function AnalyticsFilters({ filters, onChange, categories, suppliers, loc
       <div className="h-4 w-px bg-border" />
 
       <Select value={filters.categoryId ?? "__all__"} onValueChange={(v) => set("categoryId", v === "__all__" ? null : v)}>
-        <SelectTrigger className="h-8 w-[130px] text-xs"><SelectValue placeholder="Category" /></SelectTrigger>
+        <SelectTrigger className="h-8 w-[130px] text-xs"><SelectValue placeholder={t("analytics.filters.category")} /></SelectTrigger>
         <SelectContent>
-          <SelectItem value="__all__">All Categories</SelectItem>
+          <SelectItem value="__all__">{t("analytics.filters.allCategories")}</SelectItem>
           {categories.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
         </SelectContent>
       </Select>
 
       <Select value={filters.supplierId ?? "__all__"} onValueChange={(v) => set("supplierId", v === "__all__" ? null : v)}>
-        <SelectTrigger className="h-8 w-[130px] text-xs"><SelectValue placeholder="Supplier" /></SelectTrigger>
+        <SelectTrigger className="h-8 w-[130px] text-xs"><SelectValue placeholder={t("analytics.filters.supplier")} /></SelectTrigger>
         <SelectContent>
-          <SelectItem value="__all__">All Suppliers</SelectItem>
+          <SelectItem value="__all__">{t("analytics.filters.allSuppliers")}</SelectItem>
           {suppliers.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
         </SelectContent>
       </Select>
 
       <Select value={filters.locationId ?? "__all__"} onValueChange={(v) => set("locationId", v === "__all__" ? null : v)}>
-        <SelectTrigger className="h-8 w-[130px] text-xs"><SelectValue placeholder="Location" /></SelectTrigger>
+        <SelectTrigger className="h-8 w-[130px] text-xs"><SelectValue placeholder={t("analytics.filters.location")} /></SelectTrigger>
         <SelectContent>
-          <SelectItem value="__all__">All Locations</SelectItem>
+          <SelectItem value="__all__">{t("analytics.filters.allLocations")}</SelectItem>
           {locations.map((l) => <SelectItem key={l.id} value={l.id}>{l.name}</SelectItem>)}
         </SelectContent>
       </Select>
 
       {activeCount > 0 && (
         <>
-          <Badge variant="secondary" className="text-xs">{activeCount} filter{activeCount !== 1 && "s"}</Badge>
+          <Badge variant="secondary" className="text-xs">{t("analytics.filters.filterCount", { count: activeCount, suffix: activeCount !== 1 ? "s" : "" })}</Badge>
           <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={clearAll}>
-            <X className="mr-1 h-3 w-3" /> Clear
+            <X className="mr-1 h-3 w-3" /> {t("analytics.filters.clear")}
           </Button>
         </>
       )}

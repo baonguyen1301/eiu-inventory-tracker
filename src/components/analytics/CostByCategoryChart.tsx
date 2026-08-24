@@ -3,6 +3,7 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recha
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Layers } from "lucide-react";
 import type { Item, Category } from "@/types/inventory";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface Props {
   items: Item[];
@@ -25,6 +26,7 @@ function formatCurrency(v: number) {
 }
 
 export function CostByCategoryChart({ items, categories }: Props) {
+  const { t } = useLanguage();
   const { data, total } = useMemo(() => {
     const costMap = new Map<string, number>();
     items.forEach((item) => {
@@ -33,7 +35,7 @@ export function CostByCategoryChart({ items, categories }: Props) {
     });
     const catMap = new Map(categories.map((c) => [c.id, c.name]));
     const data = [...costMap.entries()]
-      .map(([id, cost]) => ({ name: catMap.get(id) || "Uncategorized", value: Math.round(cost * 100) / 100 }))
+      .map(([id, cost]) => ({ name: catMap.get(id) || t("common.none"), value: Math.round(cost * 100) / 100 }))
       .filter((d) => d.value > 0)
       .sort((a, b) => b.value - a.value);
     const total = data.reduce((s, d) => s + d.value, 0);
@@ -41,7 +43,7 @@ export function CostByCategoryChart({ items, categories }: Props) {
   }, [items, categories]);
 
   if (data.length === 0) {
-    return <EmptyState icon={Layers} title="No cost data" description="No categorized items with cost data." />;
+    return <EmptyState icon={Layers} title={t("analytics.costByCategoryChart.empty")} description={t("analytics.costByCategoryChart.emptyDescription")} />;
   }
 
   return (
@@ -61,7 +63,7 @@ export function CostByCategoryChart({ items, categories }: Props) {
             <Cell key={i} fill={COLORS[i % COLORS.length]} />
           ))}
         </Pie>
-        <text x="50%" y="48%" textAnchor="middle" className="fill-foreground text-xs">Total</text>
+        <text x="50%" y="48%" textAnchor="middle" className="fill-foreground text-xs">{t("analytics.costByCategoryChart.total")}</text>
         <text x="50%" y="56%" textAnchor="middle" className="fill-foreground text-sm font-semibold">{formatCurrency(total)}</text>
         <Tooltip formatter={(v: number) => formatCurrency(v)} />
         <Legend formatter={(value) => <span className="text-xs text-muted-foreground">{value}</span>} />

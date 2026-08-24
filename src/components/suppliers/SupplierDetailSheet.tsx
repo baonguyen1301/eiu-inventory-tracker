@@ -14,6 +14,7 @@ import { SupplierOrderHistory } from "@/components/suppliers/SupplierOrderHistor
 import { SupplierPerformance } from "@/components/suppliers/SupplierPerformance";
 import { SupplierDeleteDialog } from "@/components/suppliers/SupplierDeleteDialog";
 import type { Supplier, Item, PurchaseOrder } from "@/types/inventory";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface SupplierDetailSheetProps {
   open: boolean;
@@ -40,6 +41,7 @@ export function SupplierDetailSheet({
   onEdit,
   onDelete,
 }: SupplierDetailSheetProps) {
+  const { t } = useLanguage();
   const linkedItems = useMemo(() => {
     if (!supplier) return [];
     return items.filter((i) => i.supplierId === supplier.id);
@@ -74,19 +76,19 @@ export function SupplierDetailSheet({
                   }}
                 >
                   <Pencil className="mr-1.5 h-3.5 w-3.5" />
-                  Edit
+                  {t("common.edit")}
                 </Button>
               )}
             </div>
           </div>
           <SheetDescription>
-            {supplier.isActive ? "Active supplier" : "Inactive supplier"}
+            {supplier.isActive ? t("suppliers.detail.activeSupplier") : t("suppliers.detail.inactiveSupplier")}
           </SheetDescription>
         </SheetHeader>
 
         {/* ── Detail grid ──────────────────────────── */}
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <DetailField icon={<Mail className="h-4 w-4" />} label="Email">
+          <DetailField icon={<Mail className="h-4 w-4" />} label={t("suppliers.detail.email")}>
             {supplier.email ? (
               <a href={`mailto:${supplier.email}`} className="text-primary hover:underline">
                 {supplier.email}
@@ -94,7 +96,7 @@ export function SupplierDetailSheet({
             ) : "—"}
           </DetailField>
 
-          <DetailField icon={<Phone className="h-4 w-4" />} label="Phone">
+          <DetailField icon={<Phone className="h-4 w-4" />} label={t("suppliers.detail.phone")}>
             {supplier.phone ? (
               <a href={`tel:${supplier.phone}`} className="text-primary hover:underline">
                 {supplier.phone}
@@ -102,20 +104,20 @@ export function SupplierDetailSheet({
             ) : "—"}
           </DetailField>
 
-          <DetailField label="Contact Person">
+          <DetailField label={t("suppliers.detail.contactPerson")}>
             {supplier.contactName || "—"}
           </DetailField>
 
-          <DetailField icon={<Clock className="h-4 w-4" />} label="Lead Time">
+          <DetailField icon={<Clock className="h-4 w-4" />} label={t("suppliers.detail.leadTime")}>
             <span className="font-mono">{supplier.leadTimeDays}d</span>
           </DetailField>
 
-          <DetailField icon={<MapPin className="h-4 w-4" />} label="Address" full>
+          <DetailField icon={<MapPin className="h-4 w-4" />} label={t("suppliers.detail.address")} full>
             {supplier.address || "—"}
           </DetailField>
 
           {supplier.notes && (
-            <DetailField label="Notes" full>
+            <DetailField label={t("suppliers.detail.notes")} full>
               {supplier.notes}
             </DetailField>
           )}
@@ -126,12 +128,12 @@ export function SupplierDetailSheet({
           <div className="flex items-center gap-2 mb-3">
             <Package className="h-4 w-4 text-muted-foreground" />
             <h3 className="text-sm font-semibold text-foreground">
-              Linked Items ({linkedItems.length})
+              {t("suppliers.detail.linkedItems", { count: linkedItems.length })}
             </h3>
           </div>
 
           {linkedItems.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-4">No items from this supplier</p>
+            <p className="text-sm text-muted-foreground py-4">{t("suppliers.detail.noLinkedItems")}</p>
           ) : (
             <div className="space-y-1">
               {displayed.map((item) => (
@@ -157,7 +159,7 @@ export function SupplierDetailSheet({
                   to="/app/catalog"
                   className="mt-2 inline-flex items-center gap-1 text-sm text-primary hover:underline"
                 >
-                  View all in catalog
+                  {t("suppliers.detail.viewAllCatalog")}
                   <ExternalLink className="h-3.5 w-3.5" />
                 </Link>
               )}

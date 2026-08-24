@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { useItems } from "@/hooks/useInventoryData";
 import { StatusBadge } from "@/components/StatusBadge";
+import { useLanguage } from "@/hooks/useLanguage";
 import type { Item } from "@/types/inventory";
 
 function stockStatus(item: Item) {
@@ -12,6 +13,7 @@ function stockStatus(item: Item) {
 }
 
 export function DashboardSearch() {
+  const { t } = useLanguage();
   const { data: items } = useItems();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -49,7 +51,7 @@ export function DashboardSearch() {
           onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
           onFocus={() => query && setOpen(true)}
           onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
-          placeholder="Search items by name, SKU, or barcode..."
+          placeholder={t("dashboard.search.placeholder")}
           className="h-full flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
         />
       </div>
@@ -57,7 +59,7 @@ export function DashboardSearch() {
       {open && query.trim() && (
         <div className="absolute top-full z-40 mt-1 w-full rounded-md border border-border bg-popover shadow-lg">
           {results.length === 0 ? (
-            <p className="px-3 py-4 text-center text-sm text-muted-foreground">No items found</p>
+            <p className="px-3 py-4 text-center text-sm text-muted-foreground">{t("dashboard.search.noResults")}</p>
           ) : (
             <ul className="divide-y divide-border py-1">
               {results.map((item) => (

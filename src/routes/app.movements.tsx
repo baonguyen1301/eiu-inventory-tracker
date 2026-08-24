@@ -14,6 +14,7 @@ import { PermissionGate } from "@/hooks/usePermissions";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import type { StockMovement } from "@/types/inventory";
+import { useLanguage } from "@/hooks/useLanguage";
 
 export const Route = createFileRoute("/app/movements")({
   component: MovementsPage,
@@ -42,6 +43,7 @@ function applyFilters(movements: StockMovement[], f: MovementFilters): StockMove
 }
 
 function MovementsPage() {
+  const { t } = useLanguage();
   const { item: itemParam } = Route.useSearch();
   const [filters, setFilters] = useState<MovementFilters>(EMPTY_MOVEMENT_FILTERS);
   const [formOpen, setFormOpen] = useState(false);
@@ -74,22 +76,22 @@ function MovementsPage() {
   const filtered = useMemo(() => applyFilters(movements, filters), [movements, filters]);
 
   const movementCsvColumns = useMemo<CSVColumn<StockMovement>[]>(() => [
-    { header: "Date", accessor: (m) => new Date(m.createdAt).toLocaleDateString() },
-    { header: "Type", accessor: (m) => m.type },
-    { header: "Item Name", accessor: (m) => itemNameMap.get(m.itemId) ?? "" },
-    { header: "SKU", accessor: (m) => items.find((i) => i.id === m.itemId)?.sku ?? "" },
-    { header: "Quantity", accessor: (m) => m.quantity },
-    { header: "Performed By", accessor: (m) => m.performedBy },
-    { header: "Reference", accessor: (m) => m.reference },
-    { header: "Notes", accessor: (m) => m.notes },
-  ], [itemNameMap, items]);
+    { header: t("movements.csv.date"), accessor: (m) => new Date(m.createdAt).toLocaleDateString() },
+    { header: t("movements.csv.type"), accessor: (m) => m.type },
+    { header: t("movements.csv.itemName"), accessor: (m) => itemNameMap.get(m.itemId) ?? "" },
+    { header: t("movements.csv.sku"), accessor: (m) => items.find((i) => i.id === m.itemId)?.sku ?? "" },
+    { header: t("movements.csv.quantity"), accessor: (m) => m.quantity },
+    { header: t("movements.csv.performedBy"), accessor: (m) => m.performedBy },
+    { header: t("movements.csv.reference"), accessor: (m) => m.reference },
+    { header: t("movements.csv.notes"), accessor: (m) => m.notes },
+  ], [itemNameMap, items, t]);
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-foreground">Stock movements</h1>
-          <p className="text-sm text-muted-foreground">{filtered.length} movements</p>
+          <h1 className="text-2xl font-semibold text-foreground">{t("movements.title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("movements.count", { count: filtered.length })}</p>
         </div>
         <div className="flex items-center gap-2">
           <CSVExportButton
@@ -100,7 +102,7 @@ function MovementsPage() {
           <PermissionGate permission="log_movement">
             <Button onClick={() => setFormOpen(true)} className="gap-1.5 bg-amber-600 hover:bg-amber-700 text-white">
               <Plus className="h-4 w-4" />
-              Log Movement
+              {t("movements.logMovement")}
             </Button>
           </PermissionGate>
         </div>
@@ -119,9 +121,9 @@ function MovementsPage() {
       {movements.length === 0 ? (
         <EmptyState
           icon={ArrowUpDown}
-          title="No stock movements recorded"
-          description="Movements track stock changes — receipts, shipments, adjustments, and transfers."
-          actionLabel="Log Movement"
+          title={t("movements.emptyTitle")}
+          description={t("movements.emptyDescription")}
+          actionLabel={t("movements.emptyAction")}
           onAction={() => setFormOpen(true)}
         />
       ) : (

@@ -4,17 +4,19 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Sidebar } from "./Sidebar";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const NAV_ITEMS = [
-  { label: "Dashboard", href: "/app/dashboard", icon: LayoutDashboard },
-  { label: "Catalog", href: "/app/catalog", icon: Package },
-  { label: "Movements", href: "/app/movements", icon: ArrowLeftRight },
-  { label: "Orders", href: "/app/purchase-orders", icon: ClipboardList },
+  { labelKey: "nav.items.dashboard", href: "/app/dashboard", icon: LayoutDashboard },
+  { labelKey: "nav.items.catalog", href: "/app/catalog", icon: Package },
+  { labelKey: "nav.items.movements", href: "/app/movements", icon: ArrowLeftRight },
+  { labelKey: "nav.items.orders", href: "/app/purchase-orders", icon: ClipboardList },
 ] as const;
 
 export function BottomNav() {
   const location = useLocation();
   const [moreOpen, setMoreOpen] = useState(false);
+  const { t } = useLanguage();
 
   const isActive = (href: string) => location.pathname === href;
 
@@ -31,7 +33,7 @@ export function BottomNav() {
             )}
           >
             <item.icon className="h-5 w-5" />
-            {item.label}
+            {t(item.labelKey)}
           </Link>
         ))}
         <button
@@ -40,13 +42,13 @@ export function BottomNav() {
           className="flex flex-1 flex-col items-center justify-center gap-0.5 text-[10px] text-muted-foreground min-h-[44px]"
         >
           <MoreHorizontal className="h-5 w-5" />
-          More
+          {t("nav.items.more")}
         </button>
       </nav>
 
       <Sheet open={moreOpen} onOpenChange={setMoreOpen}>
         <SheetContent side="bottom" className="max-h-[70vh] p-0">
-          <SheetTitle className="sr-only">More navigation</SheetTitle>
+          <SheetTitle className="sr-only">{t("nav.header.moreNavigation")}</SheetTitle>
           <Sidebar onNavigate={() => setMoreOpen(false)} />
         </SheetContent>
       </Sheet>

@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import type { Item, Category } from "@/types/inventory";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface StockByCategoryChartProps {
   items: Item[];
@@ -9,6 +10,7 @@ interface StockByCategoryChartProps {
 }
 
 export function StockByCategoryChart({ items, categories }: StockByCategoryChartProps) {
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const data = useMemo(() => {
@@ -21,7 +23,7 @@ export function StockByCategoryChart({ items, categories }: StockByCategoryChart
   }, [items, categories]);
 
   if (data.length === 0) {
-    return <p className="py-8 text-center text-sm text-muted-foreground">No category data available</p>;
+    return <p className="py-8 text-center text-sm text-muted-foreground">{t("analytics.stockByCategoryChart.empty")}</p>;
   }
 
   const height = Math.max(200, data.length * 40 + 40);
@@ -31,7 +33,7 @@ export function StockByCategoryChart({ items, categories }: StockByCategoryChart
       <BarChart data={data} layout="vertical" margin={{ left: 0, right: 20, top: 5, bottom: 5 }}>
         <XAxis type="number" tick={{ fontSize: 12 }} />
         <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 12 }} />
-        <Tooltip formatter={(value: number) => [value, "Items"]} />
+        <Tooltip formatter={(value: number) => [value, t("analytics.stockByCategoryChart.items")]} />
         <Bar dataKey="count" radius={[0, 4, 4, 0]} cursor="pointer"
           onClick={(d: any) => navigate({ to: "/app/catalog", search: { category: d.id } as any })}>
           {data.map((_, i) => (

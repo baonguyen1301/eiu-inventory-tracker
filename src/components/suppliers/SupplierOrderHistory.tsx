@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { PurchaseOrder } from "@/types/inventory";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface SupplierOrderHistoryProps {
   purchaseOrders: PurchaseOrder[];
@@ -27,6 +28,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export function SupplierOrderHistory({ purchaseOrders, supplierId }: SupplierOrderHistoryProps) {
+  const { t } = useLanguage();
   const filtered = useMemo(() => {
     return purchaseOrders
       .filter((po) => po.supplierId === supplierId)
@@ -40,13 +42,13 @@ export function SupplierOrderHistory({ purchaseOrders, supplierId }: SupplierOrd
       <div className="flex items-center gap-2 mb-3">
         <FileText className="h-4 w-4 text-muted-foreground" />
         <h3 className="text-sm font-semibold text-foreground">
-          Order History ({filtered.length})
+          {t("suppliers.orderHistory.title", { count: filtered.length })}
         </h3>
       </div>
 
       {filtered.length === 0 ? (
         <p className="text-sm text-muted-foreground py-4">
-          No orders placed with this supplier.
+          {t("suppliers.orderHistory.empty")}
         </p>
       ) : (
         <div className="space-y-2">
@@ -54,12 +56,12 @@ export function SupplierOrderHistory({ purchaseOrders, supplierId }: SupplierOrd
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-xs">PO #</TableHead>
-                  <TableHead className="text-xs">Status</TableHead>
-                  <TableHead className="text-xs w-[60px]">Items</TableHead>
-                  <TableHead className="text-xs">Total</TableHead>
-                  <TableHead className="text-xs">Expected</TableHead>
-                  <TableHead className="text-xs">Created</TableHead>
+                  <TableHead className="text-xs">{t("suppliers.orderHistory.poNumber")}</TableHead>
+                  <TableHead className="text-xs">{t("suppliers.orderHistory.status")}</TableHead>
+                  <TableHead className="text-xs w-[60px]">{t("suppliers.orderHistory.items")}</TableHead>
+                  <TableHead className="text-xs">{t("suppliers.orderHistory.total")}</TableHead>
+                  <TableHead className="text-xs">{t("suppliers.orderHistory.expected")}</TableHead>
+                  <TableHead className="text-xs">{t("suppliers.orderHistory.created")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -89,7 +91,7 @@ export function SupplierOrderHistory({ purchaseOrders, supplierId }: SupplierOrd
 
           {filtered.length > MAX_ORDERS && (
             <p className="text-xs text-muted-foreground">
-              Showing {MAX_ORDERS} of {filtered.length} orders
+              {t("suppliers.orderHistory.showing", { shown: MAX_ORDERS, total: filtered.length })}
             </p>
           )}
         </div>

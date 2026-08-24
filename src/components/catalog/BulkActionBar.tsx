@@ -1,5 +1,6 @@
 import { X, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/hooks/useLanguage";
 import {
   Select,
   SelectContent,
@@ -23,11 +24,13 @@ interface BulkActionBarProps {
   onPrintLabels?: () => void;
 }
 
-const STATUS_OPTIONS = [
-  { value: ItemStatus.Active, label: "Active" },
-  { value: ItemStatus.Discontinued, label: "Discontinued" },
-  { value: ItemStatus.Archived, label: "Archived" },
-];
+function useStatusOptions(t: (k: string) => string) {
+  return [
+    { value: ItemStatus.Active, label: t("catalog.form.statusActive") },
+    { value: ItemStatus.Discontinued, label: t("catalog.form.statusDiscontinued") },
+    { value: ItemStatus.Archived, label: t("catalog.form.statusArchived") },
+  ];
+}
 
 export function BulkActionBar({
   selectedCount,
@@ -41,23 +44,25 @@ export function BulkActionBar({
   onDeselectAll,
   onPrintLabels,
 }: BulkActionBarProps) {
+  const { t } = useLanguage();
+  const STATUS_OPTIONS = useStatusOptions(t);
   if (selectedCount === 0) return null;
 
   return (
     <div
       className="fixed inset-x-0 bottom-0 z-50 flex items-center justify-between gap-3 border-t border-border bg-card px-4 py-3 shadow-lg animate-in slide-in-from-bottom duration-300 sm:px-6"
       role="toolbar"
-      aria-label="Bulk actions"
+      aria-label={t("catalog.bulkBar.ariaLabel")}
     >
       <span className="shrink-0 text-sm font-medium text-foreground">
-        {selectedCount} item{selectedCount !== 1 ? "s" : ""} selected
+        {t("catalog.bulkBar.selected", { count: selectedCount })}
       </span>
 
       <div className="flex flex-wrap items-center gap-2">
         {/* Category */}
         <Select onValueChange={onUpdateCategory}>
           <SelectTrigger className="h-8 w-[140px] text-xs">
-            <SelectValue placeholder="Category" />
+            <SelectValue placeholder={t("catalog.bulkBar.category")} />
           </SelectTrigger>
           <SelectContent>
             {categories.map((c) => (
@@ -69,7 +74,7 @@ export function BulkActionBar({
         {/* Supplier */}
         <Select onValueChange={onUpdateSupplier}>
           <SelectTrigger className="h-8 w-[140px] text-xs">
-            <SelectValue placeholder="Supplier" />
+            <SelectValue placeholder={t("catalog.bulkBar.supplier")} />
           </SelectTrigger>
           <SelectContent>
             {suppliers.map((s) => (
@@ -81,7 +86,7 @@ export function BulkActionBar({
         {/* Location */}
         <Select onValueChange={onUpdateLocation}>
           <SelectTrigger className="h-8 w-[140px] text-xs">
-            <SelectValue placeholder="Location" />
+            <SelectValue placeholder={t("catalog.bulkBar.location")} />
           </SelectTrigger>
           <SelectContent>
             {locations.map((l) => (
@@ -93,7 +98,7 @@ export function BulkActionBar({
         {/* Status */}
         <Select onValueChange={(v) => onUpdateStatus(v as ItemStatus)}>
           <SelectTrigger className="h-8 w-[130px] text-xs">
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder={t("catalog.bulkBar.status")} />
           </SelectTrigger>
           <SelectContent>
             {STATUS_OPTIONS.map((o) => (
@@ -105,13 +110,13 @@ export function BulkActionBar({
         {onPrintLabels && (
           <Button variant="outline" size="sm" onClick={onPrintLabels} className="h-8 gap-1 text-xs">
             <Printer className="h-3 w-3" />
-            Print Labels
+            {t("catalog.bulkBar.printLabels")}
           </Button>
         )}
 
         <Button variant="ghost" size="sm" onClick={onDeselectAll} className="h-8 gap-1 text-xs">
           <X className="h-3 w-3" />
-          Deselect All
+          {t("catalog.bulkBar.deselectAll")}
         </Button>
       </div>
     </div>
