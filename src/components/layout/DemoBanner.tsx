@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDemo } from "@/hooks/useDemo";
 import { useRole } from "@/hooks/useRole";
+import { useLanguage } from "@/hooks/useLanguage";
 import { X, ChevronDown } from "lucide-react";
 import type { UserRoleType } from "@/lib/roles";
 import {
@@ -10,20 +11,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const roles: { value: UserRoleType; label: string }[] = [
-  { value: "admin", label: "Admin" },
-  { value: "manager", label: "Manager" },
-  { value: "requestor", label: "Requestor" },
-];
-
 export function DemoBanner() {
   const { isDemo } = useDemo();
   const { role, setDemoRole } = useRole();
+  const { t } = useLanguage();
   const [dismissed, setDismissed] = useState(false);
 
   if (!isDemo || dismissed) return null;
 
-  const currentLabel = roles.find((r) => r.value === role)?.label ?? "Admin";
+  const roles: { value: UserRoleType; label: string }[] = [
+    { value: "admin", label: t("nav.roles.admin") },
+    { value: "manager", label: t("nav.roles.manager") },
+    { value: "requestor", label: t("nav.roles.requestor") },
+  ];
+
+  const currentLabel = roles.find((r) => r.value === role)?.label ?? t("nav.roles.admin");
 
   return (
     <div className="sticky top-0 z-50 flex h-10 w-full items-center justify-between bg-primary px-3 text-sm font-medium text-primary-foreground">
@@ -32,8 +34,8 @@ export function DemoBanner() {
 
       {/* Centred content */}
       <div className="flex items-center gap-1.5">
-        <span className="hidden sm:inline">Exploring as</span>
-        <span className="sm:hidden">As</span>
+        <span className="hidden sm:inline">{t("nav.demoBanner.exploringAs")}</span>
+        <span className="sm:hidden">{t("nav.demoBanner.exploringAsShort")}</span>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -59,7 +61,7 @@ export function DemoBanner() {
         </DropdownMenu>
 
         <span className="hidden sm:inline text-primary-foreground/70">
-          · data resets each session
+          {t("nav.demoBanner.dataResets")}
         </span>
       </div>
 
@@ -67,7 +69,7 @@ export function DemoBanner() {
         type="button"
         onClick={() => setDismissed(true)}
         className="w-8 shrink-0 flex items-center justify-center rounded p-0.5 transition-colors hover:bg-primary-foreground/20"
-        aria-label="Dismiss demo banner"
+        aria-label={t("nav.demoBanner.dismiss")}
       >
         <X className="h-3.5 w-3.5" />
       </button>

@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useCreateSupplier, useUpdateSupplier } from "@/hooks/useInventoryMutations";
 import type { Supplier } from "@/types/inventory";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const schema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -45,6 +46,7 @@ interface SupplierFormSheetProps {
 }
 
 export function SupplierFormSheet({ open, onOpenChange, supplier }: SupplierFormSheetProps) {
+  const { t } = useLanguage();
   const isEdit = !!supplier;
   const createSupplier = useCreateSupplier();
   const updateSupplier = useUpdateSupplier();
@@ -104,10 +106,10 @@ export function SupplierFormSheet({ open, onOpenChange, supplier }: SupplierForm
         },
         {
           onSuccess: () => {
-            toast.success("Supplier updated");
+            toast.success(t("suppliers.form.updated"));
             onOpenChange(false);
           },
-          onError: (e) => toast.error(e.message || "Failed to update supplier."),
+          onError: (e) => toast.error(e.message || t("suppliers.form.updateFailed")),
         },
       );
     } else {
@@ -127,10 +129,10 @@ export function SupplierFormSheet({ open, onOpenChange, supplier }: SupplierForm
       };
       createSupplier.mutate(newSupplier, {
         onSuccess: () => {
-          toast.success("Supplier created");
+          toast.success(t("suppliers.form.created"));
           onOpenChange(false);
         },
-        onError: (e) => toast.error(e.message || "Failed to create supplier."),
+        onError: (e) => toast.error(e.message || t("suppliers.form.createFailed")),
       });
     }
   }
@@ -139,9 +141,9 @@ export function SupplierFormSheet({ open, onOpenChange, supplier }: SupplierForm
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>{isEdit ? "Edit Supplier" : "New Supplier"}</SheetTitle>
+          <SheetTitle>{isEdit ? t("suppliers.form.editTitle") : t("suppliers.form.newTitle")}</SheetTitle>
           <SheetDescription>
-            {isEdit ? "Update supplier details." : "Add a new supplier to the directory."}
+            {isEdit ? t("suppliers.form.editDescription") : t("suppliers.form.newDescription")}
           </SheetDescription>
         </SheetHeader>
 
@@ -152,8 +154,8 @@ export function SupplierFormSheet({ open, onOpenChange, supplier }: SupplierForm
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name *</FormLabel>
-                  <FormControl><Input {...field} placeholder="Supplier name" /></FormControl>
+                  <FormLabel>{t("suppliers.form.name")}</FormLabel>
+                  <FormControl><Input {...field} placeholder={t("suppliers.form.namePlaceholder")} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -164,8 +166,8 @@ export function SupplierFormSheet({ open, onOpenChange, supplier }: SupplierForm
               name="contactName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Contact Person</FormLabel>
-                  <FormControl><Input {...field} placeholder="Contact name" /></FormControl>
+                  <FormLabel>{t("suppliers.form.contactPerson")}</FormLabel>
+                  <FormControl><Input {...field} placeholder={t("suppliers.form.contactPersonPlaceholder")} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -177,8 +179,8 @@ export function SupplierFormSheet({ open, onOpenChange, supplier }: SupplierForm
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl><Input type="email" {...field} placeholder="email@example.com" /></FormControl>
+                    <FormLabel>{t("suppliers.form.email")}</FormLabel>
+                    <FormControl><Input type="email" {...field} placeholder={t("suppliers.form.emailPlaceholder")} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -188,8 +190,8 @@ export function SupplierFormSheet({ open, onOpenChange, supplier }: SupplierForm
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone</FormLabel>
-                    <FormControl><Input {...field} placeholder="+1 555 000 0000" /></FormControl>
+                    <FormLabel>{t("suppliers.form.phone")}</FormLabel>
+                    <FormControl><Input {...field} placeholder={t("suppliers.form.phonePlaceholder")} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -201,8 +203,8 @@ export function SupplierFormSheet({ open, onOpenChange, supplier }: SupplierForm
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Address</FormLabel>
-                  <FormControl><Textarea {...field} rows={2} placeholder="Street, City, State" /></FormControl>
+                  <FormLabel>{t("suppliers.form.address")}</FormLabel>
+                  <FormControl><Textarea {...field} rows={2} placeholder={t("suppliers.form.addressPlaceholder")} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -214,7 +216,7 @@ export function SupplierFormSheet({ open, onOpenChange, supplier }: SupplierForm
                 name="leadTimeDays"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Lead Time (days)</FormLabel>
+                    <FormLabel>{t("suppliers.form.leadTimeDays")}</FormLabel>
                     <FormControl><Input type="number" min={0} {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
@@ -225,7 +227,7 @@ export function SupplierFormSheet({ open, onOpenChange, supplier }: SupplierForm
                 name="minOrderQuantity"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Min Order Qty</FormLabel>
+                    <FormLabel>{t("suppliers.form.minOrderQty")}</FormLabel>
                     <FormControl><Input type="number" min={0} {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
@@ -238,8 +240,8 @@ export function SupplierFormSheet({ open, onOpenChange, supplier }: SupplierForm
               name="paymentTerms"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Payment Terms</FormLabel>
-                  <FormControl><Input {...field} placeholder="Net 30, COD, etc." /></FormControl>
+                  <FormLabel>{t("suppliers.form.paymentTerms")}</FormLabel>
+                  <FormControl><Input {...field} placeholder={t("suppliers.form.paymentTermsPlaceholder")} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -250,16 +252,16 @@ export function SupplierFormSheet({ open, onOpenChange, supplier }: SupplierForm
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Notes</FormLabel>
-                  <FormControl><Textarea {...field} rows={3} placeholder="Additional notes…" /></FormControl>
+                  <FormLabel>{t("suppliers.form.notes")}</FormLabel>
+                  <FormControl><Textarea {...field} rows={3} placeholder={t("suppliers.form.notesPlaceholder")} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
             <div className="flex justify-end gap-2 pt-4">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-              <Button type="submit">{isEdit ? "Save Changes" : "Create Supplier"}</Button>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t("common.cancel")}</Button>
+              <Button type="submit">{isEdit ? t("suppliers.form.saveChanges") : t("suppliers.form.createSupplier")}</Button>
             </div>
           </form>
         </Form>

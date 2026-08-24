@@ -1,5 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useDemo } from "@/hooks/useDemo";
+import { useLanguage } from "@/hooks/useLanguage";
+import { LanguageToggle } from "@/components/layout/LanguageToggle";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { useState, useEffect } from "react";
 import {
@@ -42,95 +44,55 @@ export const Route = createFileRoute("/")({
 
 /* ─── Data ──────────────────────────────────────────── */
 const navLinks = [
-  { label: "Features", href: "#features" },
-  { label: "Solutions", href: "#solutions" },
-  { label: "Analytics", href: "#analytics" },
-];
+  { key: "features", href: "#features" },
+  { key: "solutions", href: "#solutions" },
+  { key: "analytics", href: "#analytics" },
+] as const;
 
 const solutions = [
   {
     icon: BarChart3,
-    title: "Real-time tracking",
-    description: "Monitor stock levels across every location with live dashboards and instant status updates.",
+    key: "realTimeTracking",
     color: "bg-primary/10 text-primary",
   },
   {
     icon: Bell,
-    title: "Smart reorders",
-    description: "Automated thresholds and AI-powered forecasting prevent stockouts before they happen.",
+    key: "smartReorders",
     color: "bg-secondary/10 text-secondary",
   },
   {
     icon: Truck,
-    title: "Supplier management",
-    description: "Unified view of contacts, lead times, purchase history, and performance scoring.",
+    key: "supplierManagement",
     color: "bg-accent/20 text-accent-foreground",
   },
   {
     icon: TrendingUp,
-    title: "Analytics & reports",
-    description: "Turn movement data into insights with trend charts, turnover analysis, and exports.",
+    key: "analyticsReports",
     color: "bg-primary/10 text-primary",
   },
-];
+] as const;
 
 const featureTabs = [
-  {
-    label: "Dashboard",
-    description: "See what matters most: stock levels, pending orders, recent movements, and alerts that need attention.",
-    image: uiScreenshot.url,
-  },
-  {
-    label: "Catalog",
-    description: "Powerful search, filters, bulk actions, and custom fields let you manage hundreds of SKUs effortlessly.",
-    image: uiScreenshot.url,
-  },
-  {
-    label: "Analytics",
-    description: "From stock trends to supplier performance, turn raw data into actionable insights and forecasts.",
-    image: uiScreenshot.url,
-  },
-];
+  { key: "dashboard", image: uiScreenshot.url },
+  { key: "catalog", image: uiScreenshot.url },
+  { key: "analytics", image: uiScreenshot.url },
+] as const;
 
 const features = [
-  {
-    icon: BarChart3,
-    title: "Real-time tracking",
-    description: "Monitor stock levels across every location as changes happen, with instant dashboards and live status indicators.",
-  },
-  {
-    icon: Bell,
-    title: "Smart reorder alerts",
-    description: "Get notified before you run out. Automated thresholds and AI-powered forecasting keep shelves stocked.",
-  },
-  {
-    icon: Truck,
-    title: "Supplier management",
-    description: "Organize contacts, lead times, and purchase history in one unified view with performance scoring.",
-  },
-  {
-    icon: ScanLine,
-    title: "Barcode scanning",
-    description: "Speed up receiving and cycle counts with built-in barcode support and quick-entry mode.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Analytics & reports",
-    description: "Turn movement data into insights with trend charts, turnover analysis, and exportable reports.",
-  },
-  {
-    icon: Users,
-    title: "Team roles & permissions",
-    description: "Control who can view, edit, or approve with granular role-based access and approval workflows.",
-  },
-];
+  { icon: BarChart3, key: "realTimeTracking" },
+  { icon: Bell, key: "smartReorderAlerts" },
+  { icon: Truck, key: "supplierManagement" },
+  { icon: ScanLine, key: "barcodeScanning" },
+  { icon: TrendingUp, key: "analyticsReports" },
+  { icon: Users, key: "teamRoles" },
+] as const;
 
 const capabilities = [
-  { icon: Shield, text: "Role-based access" },
-  { icon: Globe, text: "Multi-location support" },
-  { icon: ScanLine, text: "Barcode ready" },
-  { icon: Zap, text: "AI-powered insights" },
-];
+  { icon: Shield, key: "roleBasedAccess" },
+  { icon: Globe, key: "multiLocationSupport" },
+  { icon: ScanLine, key: "barcodeReady" },
+  { icon: Zap, key: "aiPoweredInsights" },
+] as const;
 
 /* ─── Components ────────────────────────────────────── */
 
@@ -158,6 +120,7 @@ function RevealSection({
 }
 
 function StickyNav({ onTryDemo }: { onTryDemo: () => void }) {
+  const { t } = useLanguage();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -186,7 +149,7 @@ function StickyNav({ onTryDemo }: { onTryDemo: () => void }) {
         <div className="hidden items-center gap-8 md:flex">
           {navLinks.map((l) => (
             <a
-              key={l.label}
+              key={l.key}
               href={l.href}
               onClick={(e) => {
                 e.preventDefault();
@@ -194,29 +157,35 @@ function StickyNav({ onTryDemo }: { onTryDemo: () => void }) {
               }}
               className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
-              {l.label}
+              {t(`landing.nav.${l.key}`)}
             </a>
           ))}
         </div>
 
         {/* Desktop CTA - secondary style */}
-        <button
-          type="button"
-          onClick={onTryDemo}
-          className="hidden items-center gap-2 rounded-lg border border-border bg-muted/60 px-5 py-2 text-sm font-medium text-foreground transition-all hover:bg-muted md:inline-flex"
-        >
-          Try demo
-        </button>
+        <div className="hidden items-center gap-3 md:flex">
+          <LanguageToggle />
+          <button
+            type="button"
+            onClick={onTryDemo}
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-muted/60 px-5 py-2 text-sm font-medium text-foreground transition-all hover:bg-muted"
+          >
+            {t("landing.nav.tryDemo")}
+          </button>
+        </div>
 
         {/* Mobile hamburger */}
-        <button
-          type="button"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden p-2 text-foreground"
-          aria-label="Toggle menu"
-        >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          <LanguageToggle />
+          <button
+            type="button"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="p-2 text-foreground"
+            aria-label={t("landing.nav.toggleMenu")}
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile dropdown */}
@@ -224,7 +193,7 @@ function StickyNav({ onTryDemo }: { onTryDemo: () => void }) {
         <div className="border-t border-border bg-background px-4 pb-4 md:hidden">
           {navLinks.map((l) => (
             <a
-              key={l.label}
+              key={l.key}
               href={l.href}
               onClick={(e) => {
                 e.preventDefault();
@@ -233,7 +202,7 @@ function StickyNav({ onTryDemo }: { onTryDemo: () => void }) {
               }}
               className="block py-3 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
-              {l.label}
+              {t(`landing.nav.${l.key}`)}
             </a>
           ))}
           <button
@@ -244,7 +213,7 @@ function StickyNav({ onTryDemo }: { onTryDemo: () => void }) {
             }}
             className="mt-2 w-full rounded-lg border border-border bg-muted/60 px-5 py-2.5 text-sm font-medium text-foreground"
           >
-            Try demo
+            {t("landing.nav.tryDemo")}
           </button>
         </div>
       )}
@@ -266,19 +235,20 @@ function BrowserFrame({ children, className = "" }: { children: React.ReactNode;
 }
 
 function FeatureTabsSection() {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState(0);
 
   return (
     <section id="analytics" className="px-4 py-20 sm:py-28">
       <RevealSection className="text-center">
         <span className="inline-block rounded-md bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-          Product tour
+          {t("landing.productTour.badge")}
         </span>
         <h2 className="mt-4 text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl">
-          Drive your business forward
+          {t("landing.productTour.title")}
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground">
-          Explore the modules that give you complete control over your supply chain.
+          {t("landing.productTour.subtitle")}
         </p>
       </RevealSection>
 
@@ -287,7 +257,7 @@ function FeatureTabsSection() {
         <div className="flex justify-center gap-2 overflow-x-auto lg:w-80 lg:shrink-0 lg:justify-start lg:flex-col lg:gap-3">
           {featureTabs.map((tab, i) => (
             <button
-              key={tab.label}
+              key={tab.key}
               type="button"
               onClick={() => setActiveTab(i)}
               className={`shrink-0 rounded-lg px-6 py-3 text-left text-sm font-medium transition-all lg:px-6 lg:py-4 ${
@@ -296,11 +266,11 @@ function FeatureTabsSection() {
                   : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
-              <span className="block font-semibold">{tab.label}</span>
+              <span className="block font-semibold">{t(`landing.productTour.tabs.${tab.key}.label`)}</span>
               <span
                 className={`mt-1 hidden text-xs leading-relaxed lg:block text-muted-foreground`}
               >
-                {tab.description}
+                {t(`landing.productTour.tabs.${tab.key}.description`)}
               </span>
             </button>
           ))}
@@ -311,12 +281,12 @@ function FeatureTabsSection() {
           <BrowserFrame>
             <img
               src={featureTabs[activeTab].image}
-              alt={`Stackwise ${featureTabs[activeTab].label} view`}
+              alt={t("landing.productTour.imageAlt", { tab: t(`landing.productTour.tabs.${featureTabs[activeTab].key}.label`) })}
               className="w-full transition-opacity duration-300"
             />
           </BrowserFrame>
           <p className="mt-4 text-sm text-muted-foreground lg:hidden">
-            {featureTabs[activeTab].description}
+            {t(`landing.productTour.tabs.${featureTabs[activeTab].key}.description`)}
           </p>
         </div>
       </div>
@@ -326,6 +296,7 @@ function FeatureTabsSection() {
 
 /* ─── Page ───────────────────────────────────────────── */
 function LandingPage() {
+  const { t } = useLanguage();
   const { enterDemoMode } = useDemo();
   const navigate = useNavigate();
 
@@ -344,18 +315,17 @@ function LandingPage() {
           <div className="animate-fade-in" style={{ animationDelay: "200ms", animationFillMode: "backwards" }}>
             <img
               src={heroBox3d}
-              alt="3D illustration of a cardboard box"
+              alt={t("landing.hero.imageAlt")}
               className="mx-auto w-48 drop-shadow-xl sm:w-56"
             />
           </div>
 
           <h1 className="mt-5 text-[32px] font-semibold leading-[1.05] tracking-tight sm:text-[44px] lg:text-[52px]">
-            The inventory platform that scales your business
+            {t("landing.hero.title")}
           </h1>
 
           <p className="mt-5 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Track stock, manage suppliers, automate reorders, and keep your
-            team aligned from one powerful command center.
+            {t("landing.hero.subtitle")}
           </p>
 
           <div className="mt-8">
@@ -364,7 +334,7 @@ function LandingPage() {
               onClick={handleTryDemo}
               className="group inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-base font-semibold text-primary-foreground shadow-lg transition-all hover:shadow-xl hover:brightness-110"
             >
-              Try demo
+              {t("landing.hero.tryDemo")}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </button>
           </div>
@@ -375,25 +345,25 @@ function LandingPage() {
       <section id="solutions" className="rounded-none bg-muted/50 px-4 py-20 sm:py-28">
         <RevealSection className="text-center">
           <span className="inline-block rounded-md bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-            Solutions
+            {t("landing.solutions.badge")}
           </span>
           <h2 className="mt-4 text-2xl font-semibold tracking-tight sm:text-3xl">
-            Built for modern inventory teams
+            {t("landing.solutions.title")}
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground">
-            Four powerful modules working together to give you complete visibility and control.
+            {t("landing.solutions.subtitle")}
           </p>
         </RevealSection>
 
         <div className="mx-auto mt-14 grid max-w-5xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {solutions.map((s, i) => (
-            <RevealSection key={s.title} delay={i * 100} className="h-full">
+            <RevealSection key={s.key} delay={i * 100} className="h-full">
               <div className="group h-full rounded-xl border border-border bg-card p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
                 <div className={`mb-4 inline-flex rounded-lg p-3 ${s.color}`}>
                   <s.icon className="h-5 w-5" />
                 </div>
-                <h3 className="mb-2 text-sm font-semibold">{s.title}</h3>
-                <p className="text-sm leading-relaxed text-muted-foreground">{s.description}</p>
+                <h3 className="mb-2 text-sm font-semibold">{t(`landing.solutions.items.${s.key}.title`)}</h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">{t(`landing.solutions.items.${s.key}.description`)}</p>
               </div>
             </RevealSection>
           ))}
@@ -407,7 +377,7 @@ function LandingPage() {
             <BrowserFrame className="shadow-2xl shadow-primary/5">
               <img
                 src={uiScreenshot.url}
-                alt="Stackwise dashboard showing inventory metrics, stock levels chart, and recent activity"
+                alt={t("landing.dashboardShowcaseAlt")}
                 className="w-full"
                 loading="lazy"
               />
@@ -423,22 +393,22 @@ function LandingPage() {
       <section id="features" className="px-4 py-20 sm:py-28">
         <RevealSection className="text-center">
           <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            Everything you need to manage inventory
+            {t("landing.features.title")}
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground">
-            Six powerful modules working together to give you complete control over your supply chain.
+            {t("landing.features.subtitle")}
           </p>
         </RevealSection>
 
         <div className="mx-auto mt-14 grid max-w-5xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f, i) => (
-            <RevealSection key={f.title} delay={i * 80}>
+            <RevealSection key={f.key} delay={i * 80}>
               <div className="group rounded-lg border border-border bg-card p-6 transition-all duration-200 hover:border-primary/30 hover:shadow-md">
                 <div className="mb-4 inline-flex rounded-md bg-primary p-2.5">
                   <f.icon className="h-5 w-5 text-white" />
                 </div>
-                <h3 className="mb-2 text-sm font-semibold">{f.title}</h3>
-                <p className="text-sm leading-relaxed text-muted-foreground">{f.description}</p>
+                <h3 className="mb-2 text-sm font-semibold">{t(`landing.features.items.${f.key}.title`)}</h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">{t(`landing.features.items.${f.key}.description`)}</p>
               </div>
             </RevealSection>
           ))}
@@ -451,13 +421,13 @@ function LandingPage() {
           <div className="mx-auto grid max-w-4xl grid-cols-2 gap-4 sm:grid-cols-4">
             {capabilities.map((c) => (
               <div
-                key={c.text}
+                key={c.key}
                 className="flex flex-col items-center gap-3 rounded-xl border border-border bg-card p-6 text-center shadow-xs"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                   <c.icon className="h-5 w-5 text-primary" />
                 </div>
-                <span className="text-sm font-medium text-foreground">{c.text}</span>
+                <span className="text-sm font-medium text-foreground">{t(`landing.capabilities.${c.key}`)}</span>
               </div>
             ))}
           </div>
@@ -470,10 +440,10 @@ function LandingPage() {
           <RevealSection>
             <img src={heroBox3d} alt="" className="mx-auto mb-6 h-16 w-16 object-contain" />
             <h2 className="text-2xl font-semibold tracking-tight text-background sm:text-3xl lg:text-4xl">
-              Ready to take control of your inventory?
+              {t("landing.finalCta.title")}
             </h2>
             <p className="mx-auto mt-4 max-w-md text-base text-background/60">
-              Explore Stackwise with sample data. No signup required.
+              {t("landing.finalCta.subtitle")}
             </p>
             <div className="mt-8">
               <button
@@ -481,7 +451,7 @@ function LandingPage() {
                 onClick={handleTryDemo}
                 className="group inline-flex items-center gap-2 rounded-lg bg-background px-5 py-2.5 text-base font-semibold text-foreground shadow-lg transition-all hover:bg-background/90"
               >
-                Try demo
+                {t("landing.finalCta.tryDemo")}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </button>
             </div>
@@ -493,7 +463,7 @@ function LandingPage() {
       <footer className="border-t border-border px-4 py-10 text-center">
         <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
           <Package className="h-4 w-4 text-primary" />
-          <span>Built with Stackwise · {new Date().getFullYear()}</span>
+          <span>{t("landing.footer.builtWith", { year: new Date().getFullYear() })}</span>
         </div>
       </footer>
     </div>

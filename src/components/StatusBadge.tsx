@@ -1,37 +1,38 @@
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/hooks/useLanguage";
 
 type StockStatus = "in-stock" | "low-stock" | "out-of-stock";
 type ItemStatus = "active" | "discontinued" | "archived";
 type BadgeStatus = StockStatus | ItemStatus;
 
-const config: Record<BadgeStatus, { label: string; dotClass: string; textClass: string }> = {
+const config: Record<BadgeStatus, { labelKey: string; dotClass: string; textClass: string }> = {
   "in-stock": {
-    label: "In Stock",
+    labelKey: "catalog.status.inStock",
     dotClass: "bg-stock-healthy",
     textClass: "text-stock-healthy",
   },
   "low-stock": {
-    label: "Low Stock",
+    labelKey: "catalog.status.lowStock",
     dotClass: "bg-stock-low animate-pulse",
     textClass: "text-stock-low",
   },
   "out-of-stock": {
-    label: "Out of Stock",
+    labelKey: "catalog.status.outOfStock",
     dotClass: "bg-stock-out",
     textClass: "text-stock-out",
   },
   active: {
-    label: "Active",
+    labelKey: "catalog.status.active",
     dotClass: "bg-primary",
     textClass: "text-primary",
   },
   discontinued: {
-    label: "Discontinued",
+    labelKey: "catalog.status.discontinued",
     dotClass: "bg-muted-foreground",
     textClass: "text-muted-foreground",
   },
   archived: {
-    label: "Archived",
+    labelKey: "catalog.status.archived",
     dotClass: "bg-muted-foreground/50",
     textClass: "text-muted-foreground/50",
   },
@@ -43,12 +44,13 @@ interface StatusBadgeProps {
 }
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
-  const { label, dotClass, textClass } = config[status];
+  const { t } = useLanguage();
+  const { labelKey, dotClass, textClass } = config[status];
 
   return (
     <span className={cn("inline-flex items-center gap-1.5 text-xs font-medium", className)}>
       <span className={cn("h-2 w-2 shrink-0 rounded-full", dotClass)} />
-      <span className={textClass}>{label}</span>
+      <span className={textClass}>{t(labelKey)}</span>
     </span>
   );
 }

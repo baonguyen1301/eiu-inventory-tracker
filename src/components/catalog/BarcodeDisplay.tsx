@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Printer, Pencil, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/hooks/useLanguage";
 import { Input } from "@/components/ui/input";
 import { escapeHtml } from "@/lib/html-escape";
 
@@ -141,6 +142,7 @@ interface BarcodeDisplayProps {
 
 export function BarcodeDisplay({ barcode, itemName, sku, location, onBarcodeChange }: BarcodeDisplayProps) {
   const [editing, setEditing] = useState(false);
+  const { t } = useLanguage();
   const [editValue, setEditValue] = useState("");
 
   const startEdit = () => {
@@ -161,14 +163,14 @@ export function BarcodeDisplay({ barcode, itemName, sku, location, onBarcodeChan
   if (!barcode) {
     return (
       <div className="rounded-lg border border-dashed border-border p-4 text-center">
-        <p className="text-sm text-muted-foreground">No barcode assigned</p>
+        <p className="text-sm text-muted-foreground">{t("catalog.barcode.noBarcode")}</p>
         {onBarcodeChange && (
           editing ? (
             <div className="mt-3 flex items-center gap-2 justify-center">
               <Input
                 value={editValue}
                 onChange={(e) => setEditValue(e.target.value)}
-                placeholder="Enter barcode value"
+                placeholder={t("catalog.barcode.barcodePlaceholder")}
                 className="h-8 w-48 text-sm"
                 autoFocus
                 onKeyDown={(e) => { if (e.key === "Enter") saveEdit(); if (e.key === "Escape") cancelEdit(); }}
@@ -182,7 +184,7 @@ export function BarcodeDisplay({ barcode, itemName, sku, location, onBarcodeChan
             </div>
           ) : (
             <Button variant="outline" size="sm" className="mt-2" onClick={startEdit}>
-              Add Barcode
+              {t("catalog.barcode.addBarcode")}
             </Button>
           )
         )}
@@ -196,9 +198,9 @@ export function BarcodeDisplay({ barcode, itemName, sku, location, onBarcodeChan
   return (
     <div className="rounded-lg border border-border bg-card p-4">
       <div className="flex items-center justify-between mb-2">
-        <p className="text-center text-xs uppercase tracking-wider text-muted-foreground flex-1">Barcode</p>
+        <p className="text-center text-xs uppercase tracking-wider text-muted-foreground flex-1">{t("catalog.barcode.label")}</p>
         {onBarcodeChange && (
-          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={startEdit} aria-label="Edit barcode">
+          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={startEdit} aria-label={t("catalog.barcode.editAriaLabel")}>
             <Pencil className="h-3 w-3" />
           </Button>
         )}
@@ -226,7 +228,7 @@ export function BarcodeDisplay({ barcode, itemName, sku, location, onBarcodeChan
           <div
             className="mx-auto flex justify-center"
             style={{ maxWidth: 240, height: 56 }}
-            aria-label={`Barcode: ${barcode}`}
+            aria-label={t("catalog.barcode.barcodeAriaLabel", { value: barcode })}
           >
             <BarcodeSVG bars={bars} />
           </div>
@@ -245,7 +247,7 @@ export function BarcodeDisplay({ barcode, itemName, sku, location, onBarcodeChan
           onClick={() => handlePrint(itemName, sku, barcode, svgMarkup, location)}
         >
           <Printer className="h-3.5 w-3.5" />
-          Print Label
+          {t("catalog.barcode.printLabel")}
         </Button>
       </div>
     </div>

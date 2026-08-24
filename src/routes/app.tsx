@@ -12,6 +12,7 @@ import { useRole } from "@/hooks/useRole";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { canAccessRoute } from "@/lib/route-guard";
 import { toast } from "sonner";
+import { useLanguage } from "@/hooks/useLanguage";
 
 export const Route = createFileRoute("/app")({
   component: AppLayout,
@@ -23,6 +24,7 @@ function AppLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [helpOpen, setHelpOpen] = useState(false);
+  const { t } = useLanguage();
 
   // Global keyboard shortcuts
   useKeyboardShortcuts({ onHelpOpen: () => setHelpOpen(true) });
@@ -30,7 +32,7 @@ function AppLayout() {
   // Role-based route guard
   useEffect(() => {
     if (isDemo && !canAccessRoute(location.pathname, role)) {
-      toast.error("You don't have permission to access that page.");
+      toast.error(t("nav.header.noPermission"));
       navigate({ to: "/app/dashboard" });
     }
   }, [location.pathname, role, navigate, isDemo]);

@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { BarChart3 } from "lucide-react";
 import type { PurchaseOrder } from "@/types/inventory";
 import { OrderStatus } from "@/types/inventory";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface SupplierPerformanceProps {
   purchaseOrders: PurchaseOrder[];
@@ -58,6 +59,7 @@ function computeMetrics(pos: PurchaseOrder[]): Metrics {
 }
 
 export function SupplierPerformance({ purchaseOrders, supplierId }: SupplierPerformanceProps) {
+  const { t } = useLanguage();
   const supplierPOs = useMemo(
     () => purchaseOrders.filter((po) => po.supplierId === supplierId),
     [purchaseOrders, supplierId],
@@ -69,23 +71,23 @@ export function SupplierPerformance({ purchaseOrders, supplierId }: SupplierPerf
     <div className="mt-8" data-testid="supplier-performance">
       <div className="flex items-center gap-2 mb-3">
         <BarChart3 className="h-4 w-4 text-muted-foreground" />
-        <h3 className="text-sm font-semibold text-foreground">Performance</h3>
+        <h3 className="text-sm font-semibold text-foreground">{t("suppliers.performance.title")}</h3>
       </div>
 
       {metrics.avgLeadTime === null ? (
         <p className="text-sm text-muted-foreground py-4">
-          Not enough data to calculate performance.
+          {t("suppliers.performance.notEnoughData")}
         </p>
       ) : (
         <div className="grid grid-cols-2 gap-3">
-          <MetricCard label="Avg Lead Time" value={`${metrics.avgLeadTime.toFixed(0)} days`} />
+          <MetricCard label={t("suppliers.performance.avgLeadTime")} value={t("suppliers.performance.avgLeadTimeValue", { days: metrics.avgLeadTime.toFixed(0) })} />
           <MetricCard
-            label="Fulfillment Accuracy"
+            label={t("suppliers.performance.fulfillmentAccuracy")}
             value={metrics.fulfillmentAccuracy !== null ? `${metrics.fulfillmentAccuracy.toFixed(1)}%` : "—"}
           />
-          <MetricCard label="Total Orders" value={String(metrics.totalOrders)} />
+          <MetricCard label={t("suppliers.performance.totalOrders")} value={String(metrics.totalOrders)} />
           <MetricCard
-            label="On-Time Delivery"
+            label={t("suppliers.performance.onTimeDelivery")}
             value={metrics.onTimeRate !== null ? `${metrics.onTimeRate.toFixed(1)}%` : "—"}
           />
         </div>

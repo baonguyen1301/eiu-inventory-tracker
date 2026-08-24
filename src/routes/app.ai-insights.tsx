@@ -22,6 +22,7 @@ import { useUpdateItem } from "@/hooks/useInventoryMutations";
 import { analyzeAllItems, type ReorderAnalysis } from "@/lib/reorder-engine";
 import { analyzeMovements, type AnomalySeverity, type AnomalyType } from "@/lib/anomaly-engine";
 import { usePermissions } from "@/hooks/usePermissions";
+import { useLanguage } from "@/hooks/useLanguage";
 import { subDays } from "date-fns";
 
 export const Route = createFileRoute("/app/ai-insights")({
@@ -38,6 +39,7 @@ type AnomalySeverityFilter = "all" | "warning" | "critical";
 type AnomalyTypeFilter = "all" | "quantity_spike" | "frequent_adjustments" | "unusual_timing";
 
 function AiInsightsPage() {
+  const { t } = useLanguage();
   const { demoStore } = useDemo();
   const { can } = usePermissions();
   const updateItem = useUpdateItem();
@@ -107,7 +109,7 @@ function AiInsightsPage() {
   if (!can("view_analytics")) {
     return (
       <div className="flex items-center justify-center py-20">
-        <p className="text-muted-foreground">You don't have permission to view this page.</p>
+        <p className="text-muted-foreground">{t("insights.noPermission")}</p>
       </div>
     );
   }
@@ -116,8 +118,8 @@ function AiInsightsPage() {
     updateItem.mutate(
       { id: a.itemId, updates: { reorderPoint: a.suggestedReorderPoint, reorderQuantity: a.suggestedReorderQuantity } },
       {
-        onSuccess: () => toast.success(`Reorder settings updated for ${a.itemName}`),
-        onError: (e) => toast.error(e.message || "Failed to update reorder settings."),
+        onSuccess: () => toast.success(t("insights.reorderUpdatedToast", { name: a.itemName })),
+        onError: (e) => toast.error(e.message || t("insights.reorderUpdateFailedToast")),
       },
     );
   };
@@ -129,8 +131,8 @@ function AiInsightsPage() {
       {/* Header */}
       <div className="flex items-center gap-3">
         <Sparkles className="h-5 w-5 text-primary" />
-        <h1 className="text-2xl font-semibold text-foreground">AI insights</h1>
-        <Badge variant="secondary" className="text-xs">Beta</Badge>
+        <h1 className="text-2xl font-semibold text-foreground">{t("insights.title")}</h1>
+        <Badge variant="secondary" className="text-xs">{t("insights.beta")}</Badge>
       </div>
 
       {/* Summary Metrics */}
@@ -143,47 +145,47 @@ function AiInsightsPage() {
       <div className="flex flex-wrap items-center gap-3">
         <Select value={urgency} onValueChange={(v) => setUrgency(v as UrgencyFilter)}>
           <SelectTrigger className="w-[140px]">
-            <SelectValue placeholder="Urgency" />
+            <SelectValue placeholder={t("insights.filters.urgency")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Urgency</SelectItem>
-            <SelectItem value="critical">Critical (&lt;7d)</SelectItem>
-            <SelectItem value="moderate">Moderate (7-14d)</SelectItem>
-            <SelectItem value="low">Low (&gt;14d)</SelectItem>
+            <SelectItem value="all">{t("insights.filters.allUrgency")}</SelectItem>
+            <SelectItem value="critical">{t("insights.filters.critical")}</SelectItem>
+            <SelectItem value="moderate">{t("insights.filters.moderate")}</SelectItem>
+            <SelectItem value="low">{t("insights.filters.low")}</SelectItem>
           </SelectContent>
         </Select>
 
         <Select value={confidence} onValueChange={(v) => setConfidence(v as ConfidenceFilter)}>
           <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Confidence" />
+            <SelectValue placeholder={t("insights.filters.confidence")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Confidence</SelectItem>
-            <SelectItem value="high">High</SelectItem>
-            <SelectItem value="medium">Medium</SelectItem>
-            <SelectItem value="low">Low</SelectItem>
+            <SelectItem value="all">{t("insights.filters.allConfidence")}</SelectItem>
+            <SelectItem value="high">{t("insights.filters.high")}</SelectItem>
+            <SelectItem value="medium">{t("insights.filters.medium")}</SelectItem>
+            <SelectItem value="low">{t("insights.filters.low")}</SelectItem>
           </SelectContent>
         </Select>
 
         <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortBy)}>
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Sort by" />
+            <SelectValue placeholder={t("insights.filters.sortBy")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="stockout">Days to Stockout</SelectItem>
-            <SelectItem value="delta">Order delta</SelectItem>
+            <SelectItem value="stockout">{t("insights.filters.daysToStockout")}</SelectItem>
+            <SelectItem value="delta">{t("insights.filters.orderDelta")}</SelectItem>
           </SelectContent>
         </Select>
 
         <span className="text-xs text-muted-foreground ml-auto">
-          {filtered.length} order{filtered.length !== 1 ? "s" : ""}
+          {t("insights.filters.orderCount", { count: filtered.length, suffix: filtered.length !== 1 ? "s" : "" })}
         </span>
       </div>
 
       {/* Suggestion Cards */}
       {filtered.length === 0 ? (
         <p className="text-center text-sm text-muted-foreground py-8">
-          No suggested orders match the current filters.
+          {t("insights.noSuggestions")}
         </p>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -202,20 +204,20 @@ function AiInsightsPage() {
       <div id="anomalies" className="space-y-4 pt-4">
         <div className="flex items-center gap-3">
           <ShieldAlert className="h-5 w-5 text-destructive" />
-          <h2 className="text-xl font-semibold">Anomaly Detection</h2>
+          <h2 className="text-xl font-semibold">{t("insights.anomalies.heading")}</h2>
           <Badge variant="destructive" className="text-xs">{allAnomalies.length}</Badge>
         </div>
 
         {/* Anomaly summary */}
         <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-          <span>Total: {allAnomalies.length}</span>
-          <span>Critical: {allAnomalies.filter((a) => a.severity === "critical").length}</span>
+          <span>{t("insights.anomalies.total", { count: allAnomalies.length })}</span>
+          <span>{t("insights.anomalies.critical", { count: allAnomalies.filter((a) => a.severity === "critical").length })}</span>
           {allAnomalies.length > 0 && (() => {
             const counts = new Map<string, number>();
             allAnomalies.forEach((a) => counts.set(a.itemId, (counts.get(a.itemId) ?? 0) + 1));
             const [topId, topCount] = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
             const topItem = itemMap.get(topId);
-            return topItem ? <span>Most affected: {topItem.name} ({topCount})</span> : null;
+            return topItem ? <span>{t("insights.anomalies.mostAffected", { name: topItem.name, count: topCount })}</span> : null;
           })()}
         </div>
 
@@ -223,24 +225,24 @@ function AiInsightsPage() {
         <div className="flex flex-wrap items-center gap-3">
           <Select value={anomSeverity} onValueChange={(v) => setAnomSeverity(v as AnomalySeverityFilter)}>
             <SelectTrigger className="w-[130px]">
-              <SelectValue placeholder="Severity" />
+              <SelectValue placeholder={t("insights.anomalies.severity")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Severity</SelectItem>
-              <SelectItem value="critical">Critical</SelectItem>
-              <SelectItem value="warning">Warning</SelectItem>
+              <SelectItem value="all">{t("insights.anomalies.allSeverity")}</SelectItem>
+              <SelectItem value="critical">{t("insights.anomalies.critical_option")}</SelectItem>
+              <SelectItem value="warning">{t("insights.anomalies.warning")}</SelectItem>
             </SelectContent>
           </Select>
 
           <Select value={anomType} onValueChange={(v) => setAnomType(v as AnomalyTypeFilter)}>
             <SelectTrigger className="w-[170px]">
-              <SelectValue placeholder="Type" />
+              <SelectValue placeholder={t("insights.anomalies.type")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="quantity_spike">Quantity Spike</SelectItem>
-              <SelectItem value="frequent_adjustments">Frequent Adjustments</SelectItem>
-              <SelectItem value="unusual_timing">Unusual Timing</SelectItem>
+              <SelectItem value="all">{t("insights.anomalies.allTypes")}</SelectItem>
+              <SelectItem value="quantity_spike">{t("insights.anomalies.quantitySpike")}</SelectItem>
+              <SelectItem value="frequent_adjustments">{t("insights.anomalies.frequentAdjustments")}</SelectItem>
+              <SelectItem value="unusual_timing">{t("insights.anomalies.unusualTiming")}</SelectItem>
             </SelectContent>
           </Select>
 
@@ -250,13 +252,13 @@ function AiInsightsPage() {
               checked={showDismissed}
               onCheckedChange={setShowDismissed}
             />
-            <Label htmlFor="show-dismissed" className="text-xs">Show Dismissed</Label>
+            <Label htmlFor="show-dismissed" className="text-xs">{t("insights.anomalies.showDismissed")}</Label>
           </div>
         </div>
 
         {filteredAnomalies.length === 0 ? (
           <p className="text-center text-sm text-muted-foreground py-8">
-            No anomalies match the current filters.
+            {t("insights.anomalies.noMatches")}
           </p>
         ) : (
           <div className="grid gap-3">

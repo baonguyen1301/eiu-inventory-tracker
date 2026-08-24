@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import type { LocationTreeNode } from "@/hooks/useLocations";
+import { useLanguage } from "@/hooks/useLanguage";
 
 export const Route = createFileRoute("/app/locations")({
   component: LocationsPage,
@@ -28,6 +29,7 @@ function findNode(nodes: LocationTreeNode[], id: string): LocationTreeNode | nul
 }
 
 function LocationsPage() {
+  const { t } = useLanguage();
   const tree = useLocationTree();
   const { data: items } = useItems();
   const { data: allLocations } = useLocationsData();
@@ -44,9 +46,9 @@ function LocationsPage() {
     <div className="mx-auto max-w-[1400px] space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-foreground">Locations</h1>
+          <h1 className="text-2xl font-semibold text-foreground">{t("locations.title")}</h1>
           <p className="text-sm text-muted-foreground">
-            {allLocations.length} location{allLocations.length !== 1 && "s"}
+            {t(allLocations.length === 1 ? "locations.count" : "locations.count_plural", { count: allLocations.length })}
           </p>
         </div>
         <PermissionGate permission="create_item">
@@ -57,11 +59,11 @@ function LocationsPage() {
               onClick={() => setTransferOpen(true)}
             >
               <ArrowRightLeft className="mr-1.5 h-4 w-4" />
-              Transfer Stock
+              {t("locations.transferStock")}
             </Button>
             <Button size="sm" onClick={() => setFormOpen(true)}>
               <Plus className="mr-1.5 h-4 w-4" />
-              New Location
+              {t("locations.newLocation")}
             </Button>
           </div>
         </PermissionGate>
@@ -71,9 +73,9 @@ function LocationsPage() {
       {tree.length === 0 ? (
         <EmptyState
           icon={MapPin}
-          title="No locations configured"
-          description="Add warehouses, zones, and shelves to organize your inventory by location."
-          actionLabel="Add Location"
+          title={t("locations.emptyTitle")}
+          description={t("locations.emptyDescription")}
+          actionLabel={t("locations.emptyAction")}
           onAction={() => setFormOpen(true)}
         />
       ) : (
@@ -95,7 +97,7 @@ function LocationsPage() {
               />
             ) : (
               <p className="py-12 text-center text-sm text-muted-foreground">
-                Select a location to view details
+                {t("locations.selectPrompt")}
               </p>
             )}
           </div>

@@ -11,14 +11,15 @@ import {
 } from "@/components/ui/dialog";
 import { useDemo } from "@/hooks/useDemo";
 import { toast } from "sonner";
+import { useLanguage } from "@/hooks/useLanguage";
 import type { NotificationPrefs } from "@/lib/demo/index";
 
-const PREF_LABELS: { key: keyof NotificationPrefs; label: string; description: string }[] = [
-  { key: "low_stock", label: "Low Stock Alerts", description: "When an item drops below its reorder point" },
-  { key: "zero_stock", label: "Zero Stock Alerts", description: "When an item reaches zero stock" },
-  { key: "po_reminder", label: "PO Reminders", description: "When a PO delivery date is within 3 days" },
-  { key: "po_overdue", label: "PO Overdue", description: "When a PO passes its expected delivery date" },
-  { key: "request_update", label: "Request Updates", description: "When an inventory request status changes" },
+const PREF_KEYS: { key: keyof NotificationPrefs; i18nKey: string }[] = [
+  { key: "low_stock", i18nKey: "lowStock" },
+  { key: "zero_stock", i18nKey: "zeroStock" },
+  { key: "po_reminder", i18nKey: "poReminder" },
+  { key: "po_overdue", i18nKey: "poOverdue" },
+  { key: "request_update", i18nKey: "requestUpdate" },
 ];
 
 interface NotificationPreferencesProps {
@@ -27,6 +28,7 @@ interface NotificationPreferencesProps {
 }
 
 export function NotificationPreferences({ open, onOpenChange }: NotificationPreferencesProps) {
+  const { t } = useLanguage();
   const { demoStore, bumpVersion } = useDemo();
   const [prefs, setPrefs] = useState<NotificationPrefs>(() =>
     demoStore?.getNotificationPrefs() ?? {
@@ -41,7 +43,7 @@ export function NotificationPreferences({ open, onOpenChange }: NotificationPref
   const handleSave = () => {
     demoStore?.setNotificationPrefs(prefs);
     bumpVersion();
-    toast.success("Notification preferences saved.");
+    toast.success(t("notifications.preferences.saved"));
     onOpenChange(false);
   };
 
@@ -51,16 +53,16 @@ export function NotificationPreferences({ open, onOpenChange }: NotificationPref
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-base">
             <Settings2 className="h-4 w-4" />
-            Notification Preferences
+            {t("notifications.preferences.title")}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-3">
-          {PREF_LABELS.map(({ key, label, description }) => (
+          {PREF_KEYS.map(({ key, i18nKey }) => (
             <div key={key} className="flex items-center justify-between gap-4 rounded-lg border border-border p-3">
               <div className="min-w-0">
-                <Label htmlFor={`pref-${key}`} className="text-sm font-medium">{label}</Label>
-                <p className="text-xs text-muted-foreground">{description}</p>
+                <Label htmlFor={`pref-${key}`} className="text-sm font-medium">{t(`notifications.preferences.${i18nKey}.label`)}</Label>
+                <p className="text-xs text-muted-foreground">{t(`notifications.preferences.${i18nKey}.description`)}</p>
               </div>
               <Switch
                 id={`pref-${key}`}
@@ -71,7 +73,7 @@ export function NotificationPreferences({ open, onOpenChange }: NotificationPref
           ))}
         </div>
 
-        <Button onClick={handleSave} className="w-full mt-2">Save Preferences</Button>
+        <Button onClick={handleSave} className="w-full mt-2">{t("notifications.preferences.save")}</Button>
       </DialogContent>
     </Dialog>
   );

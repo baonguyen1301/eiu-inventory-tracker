@@ -15,6 +15,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNotifications, useMarkAsRead, useMarkAllAsRead, useDismissNotification } from "@/hooks/useNotifications";
 import { getNotificationIcon } from "./notification-icons";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/hooks/useLanguage";
 import type { Notification, NotificationType } from "@/types/inventory";
 
 type FilterTab = "all" | "unread" | "stock" | "po" | "requests";
@@ -34,6 +35,7 @@ interface NotificationCenterProps {
 }
 
 export function NotificationCenter({ open, onOpenChange, onOpenPrefs }: NotificationCenterProps) {
+  const { t } = useLanguage();
   const [tab, setTab] = useState<FilterTab>("all");
   const { data: notifications } = useNotifications();
   const markAsRead = useMarkAsRead();
@@ -59,7 +61,7 @@ export function NotificationCenter({ open, onOpenChange, onOpenPrefs }: Notifica
         <SheetHeader className="border-b border-border px-4 py-3">
           <div className="flex items-center justify-between">
             <SheetTitle className="text-base">
-              Notifications
+              {t("notifications.title")}
               {unreadCount > 0 && (
                 <span className="ml-2 rounded-full bg-destructive px-2 py-0.5 font-mono text-xs text-destructive-foreground">
                   {unreadCount}
@@ -70,10 +72,10 @@ export function NotificationCenter({ open, onOpenChange, onOpenPrefs }: Notifica
               {unreadCount > 0 && (
                 <Button variant="ghost" size="sm" className="text-xs" onClick={markAllAsRead}>
                   <CheckCheck className="mr-1 h-3.5 w-3.5" />
-                  Mark All as Read
+                  {t("notifications.markAllAsRead")}
                 </Button>
               )}
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onOpenPrefs?.()} aria-label="Notification settings">
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onOpenPrefs?.()} aria-label={t("notifications.settings")}>
                 <Settings2 className="h-4 w-4" />
               </Button>
             </div>
@@ -83,11 +85,11 @@ export function NotificationCenter({ open, onOpenChange, onOpenPrefs }: Notifica
         <div className="border-b border-border px-4 py-2">
           <Tabs value={tab} onValueChange={(v) => setTab(v as FilterTab)}>
             <TabsList className="h-8 w-full">
-              <TabsTrigger value="all" className="text-xs flex-1">All</TabsTrigger>
-              <TabsTrigger value="unread" className="text-xs flex-1">Unread</TabsTrigger>
-              <TabsTrigger value="stock" className="text-xs flex-1">Stock</TabsTrigger>
-              <TabsTrigger value="po" className="text-xs flex-1">PO</TabsTrigger>
-              <TabsTrigger value="requests" className="text-xs flex-1">Requests</TabsTrigger>
+              <TabsTrigger value="all" className="text-xs flex-1">{t("notifications.tabs.all")}</TabsTrigger>
+              <TabsTrigger value="unread" className="text-xs flex-1">{t("notifications.tabs.unread")}</TabsTrigger>
+              <TabsTrigger value="stock" className="text-xs flex-1">{t("notifications.tabs.stock")}</TabsTrigger>
+              <TabsTrigger value="po" className="text-xs flex-1">{t("notifications.tabs.po")}</TabsTrigger>
+              <TabsTrigger value="requests" className="text-xs flex-1">{t("notifications.tabs.requests")}</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -96,7 +98,7 @@ export function NotificationCenter({ open, onOpenChange, onOpenPrefs }: Notifica
           {filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-2 py-16 text-muted-foreground">
               <Bell className="h-8 w-8" />
-              <p className="text-sm">No notifications</p>
+              <p className="text-sm">{t("notifications.empty")}</p>
             </div>
           ) : (
             <div className="divide-y divide-border">
@@ -126,6 +128,7 @@ function NotificationItem({
   onClick: () => void;
   onDismiss: () => void;
 }) {
+  const { t } = useLanguage();
   return (
     <div
       className={cn(
@@ -156,7 +159,7 @@ function NotificationItem({
         type="button"
         className="shrink-0 self-start rounded p-1 opacity-0 transition-opacity hover:bg-muted group-hover:opacity-100"
         onClick={(e) => { e.stopPropagation(); onDismiss(); }}
-        aria-label="Dismiss notification"
+        aria-label={t("notifications.dismiss")}
       >
         <X className="h-3.5 w-3.5 text-muted-foreground" />
       </button>

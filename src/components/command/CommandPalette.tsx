@@ -32,6 +32,7 @@ import { ACTIONS } from "./palette-actions";
 import { ItemResultRow } from "./ItemResultRow";
 import { parseQuery } from "@/lib/nl-search-parser";
 import { useDemo } from "@/hooks/useDemo";
+import { useLanguage } from "@/hooks/useLanguage";
 
 // ─── Component ───────────────────────────────────────────
 
@@ -47,6 +48,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const { can } = usePermissions();
   const { role } = useRole();
   const { demoStore } = useDemo();
+  const { t } = useLanguage();
 
   // Reset query on close
   useEffect(() => {
@@ -125,14 +127,14 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const matchedPages = useMemo(() => {
     const accessible = PAGES.filter((p) => canAccessRoute(p.path, role));
     if (!q) return accessible;
-    return accessible.filter((p) => p.label.toLowerCase().includes(q));
+    return accessible.filter((p) => t(p.labelKey).toLowerCase().includes(q));
   }, [q, role]);
 
   // Filter actions by query + permissions
   const matchedActions = useMemo(() => {
     const allowed = ACTIONS.filter((a) => !a.permission || can(a.permission));
     if (!q) return allowed;
-    return allowed.filter((a) => a.label.toLowerCase().includes(q));
+    return allowed.filter((a) => t(a.labelKey).toLowerCase().includes(q));
   }, [q, can]);
 
   const hasResults = matchedItems.length > 0 || nlItems.length > 0 || matchedPages.length > 0 || matchedActions.length > 0;
@@ -154,8 +156,8 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       }
 
       if (value.startsWith("action:")) {
-        const label = value.replace("action:", "");
-        const action = ACTIONS.find((a) => a.label === label);
+        const labelKey = value.replace("action:", "");
+        const action = ACTIONS.find((a) => a.labelKey === labelKey);
         action?.action(navigate);
       }
     },
@@ -170,28 +172,28 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
           className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5"
         >
           <CommandInput
-            placeholder="Search items, pages, actions…"
+            placeholder={t("command.searchPlaceholder")}
             value={query}
             onValueChange={setQuery}
           />
           <CommandList>
-            {!hasResults && <CommandEmpty>No items match your query.</CommandEmpty>}
+            {!hasResults && <CommandEmpty>{t("command.noResults")}</CommandEmpty>}
 
             {/* NL Search Results */}
             {isNL && nlItems.length > 0 && (
-              <CommandGroup heading="Search Results">
+              <CommandGroup heading={t("command.searchResults")}>
                 <div className="px-2 pb-2 flex flex-wrap gap-1">
                   {parsed.filters.status && (
-                    <Badge variant="outline" className="text-[10px]">status: {parsed.filters.status}</Badge>
+                    <Badge variant="outline" className="text-[10px]">{t("command.filters.status")}: {parsed.filters.status}</Badge>
                   )}
                   {parsed.filters.category && (
-                    <Badge variant="outline" className="text-[10px]">category: {parsed.filters.category}</Badge>
+                    <Badge variant="outline" className="text-[10px]">{t("command.filters.category")}: {parsed.filters.category}</Badge>
                   )}
                   {parsed.filters.supplier && (
-                    <Badge variant="outline" className="text-[10px]">supplier: {parsed.filters.supplier}</Badge>
+                    <Badge variant="outline" className="text-[10px]">{t("command.filters.supplier")}: {parsed.filters.supplier}</Badge>
                   )}
                   {parsed.searchTerms.length > 0 && (
-                    <Badge variant="outline" className="text-[10px]">terms: {parsed.searchTerms.join(", ")}</Badge>
+                    <Badge variant="outline" className="text-[10px]">{t("command.filters.terms")}: {parsed.searchTerms.join(", ")}</Badge>
                   )}
                 </div>
                 {nlItems.map((item) => (
@@ -209,13 +211,13 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
             {isNL && nlItems.length === 0 && q.length > 0 && (
               <CommandEmpty>
                 <div className="space-y-1">
-                  <p>No items match your query.</p>
+                  <p>{t("command.noResults")}</p>
                   <div className="flex flex-wrap gap-1 justify-center">
                     {parsed.filters.status && (
-                      <Badge variant="outline" className="text-[10px]">status: {parsed.filters.status}</Badge>
+                      <Badge variant="outline" className="text-[10px]">{t("command.filters.status")}: {parsed.filters.status}</Badge>
                     )}
                     {parsed.filters.category && (
-                      <Badge variant="outline" className="text-[10px]">category: {parsed.filters.category}</Badge>
+                      <Badge variant="outline" className="text-[10px]">{t("command.filters.category")}: {parsed.filters.category}</Badge>
                     )}
                   </div>
                 </div>
@@ -224,7 +226,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
 
             {/* Standard item search */}
             {matchedItems.length > 0 && (
-              <CommandGroup heading="Items">
+              <CommandGroup heading={t("command.items")}>
                 {matchedItems.map((item) => (
                   <CommandItem
                     key={item.id}
@@ -238,7 +240,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
             )}
 
             {matchedPages.length > 0 && (
-              <CommandGroup heading="Pages">
+              <CommandGroup heading={t("command.pages")}>
                 {matchedPages.map((page) => (
                   <CommandItem
                     key={page.path}
@@ -246,22 +248,22 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                     onSelect={handleSelect}
                   >
                     {page.icon}
-                    <span>{page.label}</span>
+                    <span>{t(page.labelKey)}</span>
                   </CommandItem>
                 ))}
               </CommandGroup>
             )}
 
             {matchedActions.length > 0 && (
-              <CommandGroup heading="Actions">
+              <CommandGroup heading={t("command.actions")}>
                 {matchedActions.map((action) => (
                   <CommandItem
-                    key={action.label}
-                    value={`action:${action.label}`}
+                    key={action.labelKey}
+                    value={`action:${action.labelKey}`}
                     onSelect={handleSelect}
                   >
                     {action.icon}
-                    <span>{action.label}</span>
+                    <span>{t(action.labelKey)}</span>
                     {action.shortcut && (
                       <CommandShortcut>{action.shortcut}</CommandShortcut>
                     )}
