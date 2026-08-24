@@ -4,6 +4,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { Package, Clock, CheckCircle, Target } from "lucide-react";
 import type { PurchaseOrder, Supplier } from "@/types/inventory";
 import { OrderStatus } from "@/types/inventory";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface Props {
   suppliers: Supplier[];
@@ -64,10 +65,11 @@ function computeMetrics(suppliers: Supplier[], pos: PurchaseOrder[]): SupplierMe
 }
 
 export function SupplierScoreCards({ suppliers, purchaseOrders }: Props) {
+  const { t } = useLanguage();
   const metrics = useMemo(() => computeMetrics(suppliers, purchaseOrders), [suppliers, purchaseOrders]);
 
   if (metrics.length === 0) {
-    return <EmptyState icon={Package} title="No supplier data" description="No suppliers have purchase orders yet." />;
+    return <EmptyState icon={Package} title={t("analytics.supplierScoreCards.empty")} description={t("analytics.supplierScoreCards.emptyDescription")} />;
   }
 
   return (
@@ -79,19 +81,19 @@ export function SupplierScoreCards({ suppliers, purchaseOrders }: Props) {
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             <div className="flex items-center justify-between">
-              <span className="flex items-center gap-1.5 text-muted-foreground"><Package className="h-3.5 w-3.5" /> Total POs</span>
+              <span className="flex items-center gap-1.5 text-muted-foreground"><Package className="h-3.5 w-3.5" /> {t("analytics.supplierScoreCards.totalPOs")}</span>
               <span className="font-medium">{m.totalPOs}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="flex items-center gap-1.5 text-muted-foreground"><Clock className="h-3.5 w-3.5" /> Avg Lead Time</span>
+              <span className="flex items-center gap-1.5 text-muted-foreground"><Clock className="h-3.5 w-3.5" /> {t("analytics.supplierScoreCards.avgLeadTime")}</span>
               <span className="font-medium">{m.avgLeadTime}d</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="flex items-center gap-1.5 text-muted-foreground"><CheckCircle className="h-3.5 w-3.5" /> On-Time Rate</span>
+              <span className="flex items-center gap-1.5 text-muted-foreground"><CheckCircle className="h-3.5 w-3.5" /> {t("analytics.supplierScoreCards.onTimeRate")}</span>
               <span className={`font-medium ${rateColor(m.onTimeRate)}`}>{m.onTimeRate}%</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="flex items-center gap-1.5 text-muted-foreground"><Target className="h-3.5 w-3.5" /> Fulfillment</span>
+              <span className="flex items-center gap-1.5 text-muted-foreground"><Target className="h-3.5 w-3.5" /> {t("analytics.supplierScoreCards.fulfillment")}</span>
               <span className={`font-medium ${rateColor(m.fulfillmentAccuracy)}`}>{m.fulfillmentAccuracy}%</span>
             </div>
           </CardContent>

@@ -3,6 +3,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } f
 import { format, startOfDay, startOfWeek, subDays } from "date-fns";
 import type { StockMovement } from "@/types/inventory";
 import { MovementType } from "@/types/inventory";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface MovementTrendsChartProps {
   movements: StockMovement[];
@@ -17,6 +18,7 @@ const LINE_COLORS: Record<string, string> = {
 };
 
 export function MovementTrendsChart({ movements, days }: MovementTrendsChartProps) {
+  const { t } = useLanguage();
   const data = useMemo(() => {
     const cutoff = subDays(new Date(), days);
     const filtered = movements.filter((m) => new Date(m.createdAt) >= cutoff);
@@ -42,7 +44,7 @@ export function MovementTrendsChart({ movements, days }: MovementTrendsChartProp
   }, [movements, days]);
 
   if (data.length === 0) {
-    return <p className="py-8 text-center text-sm text-muted-foreground">No movements in this period</p>;
+    return <p className="py-8 text-center text-sm text-muted-foreground">{t("analytics.movementTrendsChart.empty")}</p>;
   }
 
   return (
@@ -53,7 +55,7 @@ export function MovementTrendsChart({ movements, days }: MovementTrendsChartProp
         <Tooltip />
         <Legend />
         {Object.entries(LINE_COLORS).map(([key, color]) => (
-          <Line key={key} type="monotone" dataKey={key} stroke={color} strokeWidth={2} dot={false} />
+          <Line key={key} type="monotone" dataKey={key} name={t(`analytics.movementTrendsChart.${key}`)} stroke={color} strokeWidth={2} dot={false} />
         ))}
       </LineChart>
     </ResponsiveContainer>

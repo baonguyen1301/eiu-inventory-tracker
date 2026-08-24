@@ -1,30 +1,33 @@
 import { useMemo } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import type { Item } from "@/types/inventory";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface StockStatusChartProps {
   items: Item[];
 }
 
 const STATUS_COLORS = ["hsl(142, 71%, 45%)", "hsl(38, 92%, 50%)", "hsl(0, 84%, 60%)"];
-const STATUS_LABELS = ["In Stock", "Low Stock", "Out of Stock"];
+
 
 export function StockStatusChart({ items }: StockStatusChartProps) {
+  const { t } = useLanguage();
+  const STATUS_LABELS = [t("analytics.stockStatusChart.inStock"), t("analytics.stockStatusChart.lowStock"), t("analytics.stockStatusChart.outOfStock")];
   const data = useMemo(() => {
     const inStock = items.filter((i) => i.currentStock > i.reorderPoint).length;
     const low = items.filter((i) => i.currentStock > 0 && i.currentStock <= i.reorderPoint).length;
     const out = items.filter((i) => i.currentStock === 0).length;
     return [
-      { name: "In Stock", value: inStock },
-      { name: "Low Stock", value: low },
-      { name: "Out of Stock", value: out },
+      { name: STATUS_LABELS[0], value: inStock },
+      { name: STATUS_LABELS[1], value: low },
+      { name: STATUS_LABELS[2], value: out },
     ].filter((d) => d.value > 0);
-  }, [items]);
+  }, [items, STATUS_LABELS]);
 
   const total = items.length;
 
   if (total === 0) {
-    return <p className="py-8 text-center text-sm text-muted-foreground">No items to display</p>;
+    return <p className="py-8 text-center text-sm text-muted-foreground">{t("analytics.stockStatusChart.empty")}</p>;
   }
 
   return (

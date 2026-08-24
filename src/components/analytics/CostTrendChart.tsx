@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { format, startOfMonth } from "date-fns";
 import type { PurchaseOrder } from "@/types/inventory";
 import { OrderStatus } from "@/types/inventory";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface Props {
   purchaseOrders: PurchaseOrder[];
@@ -16,6 +17,7 @@ function formatCurrency(v: number) {
 }
 
 export function CostTrendChart({ purchaseOrders }: Props) {
+  const { t } = useLanguage();
   const [cumulative, setCumulative] = useState(false);
 
   const data = useMemo(() => {
@@ -44,14 +46,14 @@ export function CostTrendChart({ purchaseOrders }: Props) {
   }, [purchaseOrders]);
 
   if (data.length === 0) {
-    return <EmptyState icon={TrendingUp} title="No spending trend" description="No received POs to chart over time." />;
+    return <EmptyState icon={TrendingUp} title={t("analytics.costTrendChart.empty")} description={t("analytics.costTrendChart.emptyDescription")} />;
   }
 
   return (
     <div className="space-y-3">
       <div className="flex gap-2">
-        <Button size="sm" variant={cumulative ? "outline" : "default"} onClick={() => setCumulative(false)}>Per Period</Button>
-        <Button size="sm" variant={cumulative ? "default" : "outline"} onClick={() => setCumulative(true)}>Cumulative</Button>
+        <Button size="sm" variant={cumulative ? "outline" : "default"} onClick={() => setCumulative(false)}>{t("analytics.costTrendChart.perPeriod")}</Button>
+        <Button size="sm" variant={cumulative ? "default" : "outline"} onClick={() => setCumulative(true)}>{t("analytics.costTrendChart.cumulative")}</Button>
       </div>
       <ResponsiveContainer width="100%" height={280}>
         <LineChart data={data} margin={{ left: 10, right: 20, top: 5, bottom: 5 }}>

@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Item, StockMovement } from "@/types/inventory";
 import { MovementType } from "@/types/inventory";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface TurnoverAnalysisProps {
   items: Item[];
@@ -10,6 +11,7 @@ interface TurnoverAnalysisProps {
 }
 
 export function TurnoverAnalysis({ items, movements }: TurnoverAnalysisProps) {
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const { fastest, slowest, mostReordered } = useMemo(() => {
@@ -39,7 +41,7 @@ export function TurnoverAnalysis({ items, movements }: TurnoverAnalysisProps) {
       <CardHeader className="pb-3"><CardTitle className="text-sm">{title}</CardTitle></CardHeader>
       <CardContent className="p-0">
         {list.length === 0 ? (
-          <p className="px-4 pb-4 text-sm text-muted-foreground">No data</p>
+          <p className="px-4 pb-4 text-sm text-muted-foreground">{t("analytics.turnoverAnalysis.noData")}</p>
         ) : (
           <div className="divide-y divide-border">
             {list.map((item, i) => (
@@ -61,9 +63,9 @@ export function TurnoverAnalysis({ items, movements }: TurnoverAnalysisProps) {
 
   return (
     <div className="grid gap-4 lg:grid-cols-3">
-      {renderList("Fastest Moving", fastest, (i) => `${i.turnoverRate.toFixed(1)}× turnover`)}
-      {renderList("Slowest Moving", slowest, (i) => `${i.turnoverRate.toFixed(1)}× turnover`)}
-      {renderList("Most Reordered", mostReordered, (i) => `${i.receivedCount} receipts`)}
+      {renderList(t("analytics.turnoverAnalysis.fastestMoving"), fastest, (i) => `${i.turnoverRate.toFixed(1)}${t("analytics.turnoverAnalysis.turnoverSuffix")}`)}
+      {renderList(t("analytics.turnoverAnalysis.slowestMoving"), slowest, (i) => `${i.turnoverRate.toFixed(1)}${t("analytics.turnoverAnalysis.turnoverSuffix")}`)}
+      {renderList(t("analytics.turnoverAnalysis.mostReordered"), mostReordered, (i) => t("analytics.turnoverAnalysis.receiptsSuffix", { count: i.receivedCount }))}
     </div>
   );
 }
